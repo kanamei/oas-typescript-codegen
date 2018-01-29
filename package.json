@@ -1,0 +1,30 @@
+{
+  "name": "oas-typescript-codegen",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/generate.js",
+  "scripts": {
+    "build": "tsc -p ."
+  },
+  "bin": {
+    "oas-typescript-codegen": "lib/cli.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.17.1",
+    "commander": "^2.13.0",
+    "eslint": "^4.16.0",
+    "json-schema-ref-parser": "^4.1.0",
+    "json-schema-to-typescript": "^5.3.2",
+    "lodash": "^4.17.4",
+    "open-api.d.ts": "^3.0.1",
+    "tosource": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.14.97",
+    "@types/node": "^9.4.0",
+    "ts-node": "^4.1.0"
+  }
+}

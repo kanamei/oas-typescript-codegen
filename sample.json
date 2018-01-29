@@ -1,0 +1,689 @@
+{
+  "openapi" : "3.0.0",
+  "servers" : [ {
+    "description" : "SwaggerHub API Auto Mocking",
+    "url" : "https://virtserver.swaggerhub.com/kanamei/filelocker/1.0.0"
+  } ],
+  "info" : {
+    "description" : "This is a simple API",
+    "version" : "1.0.0",
+    "title" : "Filelocker API",
+    "contact" : {
+      "email" : "aota@kanamei.co.jp"
+    },
+    "license" : {
+      "name" : "Apache 2.0",
+      "url" : "http://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "tags" : [ {
+    "name" : "Session",
+    "description" : "API Session"
+  }, {
+    "name" : "Owner",
+    "description" : "Operations available to owners"
+  }, {
+    "name" : "Admin",
+    "description" : "Operations available to admins"
+  }, {
+    "name" : "Member",
+    "description" : "Operations available to regular members"
+  } ],
+  "security" : [ {
+    "JWT" : [ ]
+  } ],
+  "paths" : {
+    "/sessions" : {
+      "post" : {
+        "tags" : [ "Session" ],
+        "summary" : "login",
+        "operationId" : "login",
+        "description" : "login",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Authentication"
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "Login succeeded",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "required" : [ "key" ],
+                  "properties" : {
+                    "token" : {
+                      "type" : "string",
+                      "example" : "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjoxLCJleHAiOjE1NDQ5NDk3NDR9.DoErKxxE_tzeWhtY0C4_NcA3Yc8VwERK3JLP8VBqmzE"
+                    },
+                    "tokenExpire" : {
+                      "type" : "number",
+                      "example" : 1544949744
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401" : {
+            "description" : "Unauthorized"
+          }
+        }
+      }
+    },
+    "/organizations/{id}" : {
+      "get" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "get organization by id",
+        "operationId" : "getOrganization",
+        "description" : "Get organization by id\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "pass an id for looking up organization",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "$ref" : "#/components/schemas/Organization"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Owner", "Admin" ],
+        "summary" : "updates an organization",
+        "operationId" : "updateOrganization",
+        "description" : "Updates an organization",
+        "responses" : {
+          "201" : {
+            "description" : "organization updated"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "404" : {
+            "description" : "an organization does not exists"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Organization"
+              }
+            }
+          },
+          "description" : "Organization to update"
+        }
+      }
+    },
+    "/teams/{id}" : {
+      "get" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "get team by id",
+        "operationId" : "getTeam",
+        "description" : "Get team by id\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "pass an id for looking up team",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "$ref" : "#/components/schemas/Team"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Owner", "Admin" ],
+        "summary" : "updates a team",
+        "operationId" : "updateTeam",
+        "description" : "Updates a team",
+        "responses" : {
+          "201" : {
+            "description" : "team updated"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "404" : {
+            "description" : "a team does not exists"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Team"
+              }
+            }
+          },
+          "description" : "Team to update"
+        }
+      }
+    },
+    "/teams/{teamId}/users/{userId}" : {
+      "put" : {
+        "tags" : [ "Owner", "Admin" ],
+        "summary" : "assign a member to the team",
+        "operationId" : "assignMemberToTeam",
+        "description" : "Assign a member to the team",
+        "responses" : {
+          "201" : {
+            "description" : "Member assigned"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "404" : {
+            "description" : "a team or an accounts does not exists"
+          }
+        },
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "description" : "pass an id for team to which the account is assigned",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "userId",
+          "description" : "pass an id for account who is assigned to the team",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "userId" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          },
+          "description" : "Team to update"
+        }
+      },
+      "delete" : {
+        "tags" : [ "Owner", "Admin" ],
+        "summary" : "unassign a member from the team",
+        "operationId" : "UnassignMemberFromTeam",
+        "description" : "Unassign a member from the team",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "teamId",
+          "description" : "pass an id for team from which account is unassigned",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "in" : "path",
+          "name" : "userId",
+          "description" : "pass an id for account who is unassigned from the team",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "Member unassigned"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "404" : {
+            "description" : "a team or an accounts does not exists"
+          }
+        }
+      }
+    },
+    "/teams" : {
+      "get" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "get all teams",
+        "operationId" : "getTeams",
+        "description" : "Get all teams",
+        "responses" : {
+          "200" : {
+            "description" : "results",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Team"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Owner", "Admin" ],
+        "summary" : "adds a team",
+        "operationId" : "addTeam",
+        "description" : "Adds a team",
+        "responses" : {
+          "201" : {
+            "description" : "team created"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing team already exists"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/Team"
+              }
+            }
+          },
+          "description" : "Team to add"
+        }
+      }
+    },
+    "/users/{id}/role" : {
+      "put" : {
+        "tags" : [ "Owner" ],
+        "summary" : "manage account's role",
+        "operationId" : "manageAccountRole",
+        "description" : "Manage account's role\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "pass an id for looking up user",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Account"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "properties" : {
+                  "role" : {
+                    "type" : "string",
+                    "enum" : [ "owner", "admin", "member" ]
+                  }
+                }
+              }
+            }
+          },
+          "description" : "New role for account"
+        }
+      }
+    },
+    "/users/{id}" : {
+      "get" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "get account by id",
+        "operationId" : "getAccount",
+        "description" : "Get account by id\n",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "description" : "pass an id for looking up user",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Account"
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "bad input parameter"
+          }
+        }
+      },
+      "put" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "updates an account",
+        "operationId" : "updateAccount",
+        "description" : "Updates an account",
+        "responses" : {
+          "201" : {
+            "description" : "account updated"
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "404" : {
+            "description" : "an account does not exists"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "required" : [ "name" ],
+                "properties" : {
+                  "user" : {
+                    "properties" : {
+                      "name" : {
+                        "type" : "string",
+                        "example" : "new name"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "description" : "User to update"
+        }
+      }
+    },
+    "/users" : {
+      "get" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "get all account",
+        "operationId" : "getAccounts",
+        "description" : "Get all accounts\n",
+        "responses" : {
+          "200" : {
+            "description" : "results",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/Account"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "adds an account",
+        "operationId" : "addAccount",
+        "description" : "Adds an account",
+        "responses" : {
+          "201" : {
+            "description" : "account created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "$ref" : "#/components/schemas/Account"
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "invalid input, object invalid"
+          },
+          "409" : {
+            "description" : "an existing account already exists"
+          }
+        },
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/createAccount"
+              }
+            }
+          },
+          "description" : "User to add"
+        }
+      }
+    },
+    "/files/prepare_upload" : {
+      "post" : {
+        "tags" : [ "Owner", "Admin", "Member" ],
+        "summary" : "create file upload url",
+        "operationId" : "prepareUpload",
+        "description" : "create file upload url (S3 Pre-Signed URL)",
+        "requestBody" : {
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "type" : "object",
+                "required" : [ "size", "content_type" ],
+                "properties" : {
+                  "size" : {
+                    "type" : "string",
+                    "example" : 33554432
+                  },
+                  "content_type" : {
+                    "type" : "string",
+                    "example" : "image/x-photoshop"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "file upload url created",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "object",
+                  "required" : [ "url", "expires_at" ],
+                  "properties" : {
+                    "url" : {
+                      "type" : "string",
+                      "example" : "https://bucket-name.s3.amazonaws.com/object-key?..."
+                    },
+                    "expires_at" : {
+                      "type" : "number",
+                      "example" : 1544949744
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400" : {
+            "description" : "Bad Request"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "securitySchemes" : {
+      "JWT" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    },
+    "schemas" : {
+      "Authentication" : {
+        "type" : "object",
+        "required" : [ "email", "password" ],
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "example" : "aota@kanamei.co.jp"
+          },
+          "password" : {
+            "type" : "string",
+            "example" : "l%r9vRcw0BnUoB7F"
+          }
+        }
+      },
+      "Account" : {
+        "type" : "object",
+        "required" : [ "email", "name", "role", "organization" ],
+        "properties" : {
+          "id" : {
+            "type" : "string",
+            "example" : "tkam2ipr"
+          },
+          "email" : {
+            "type" : "string",
+            "example" : "aota@kanamei.co.jp"
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "あおっち"
+          },
+          "role" : {
+            "type" : "string",
+            "enum" : [ "owner", "admin", "member" ]
+          },
+          "teams" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/Team"
+            }
+          },
+          "organizationId" : {
+            "type" : "string",
+            "example" : "q1cqwzzr"
+          }
+        }
+      },
+      "createAccount" : {
+        "type" : "object",
+        "required" : [ "email", "name", "password", "roleId", "organizationId" ],
+        "properties" : {
+          "email" : {
+            "type" : "string",
+            "example" : "aota@kanamei.co.jp"
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "あおっち"
+          },
+          "password" : {
+            "type" : "string",
+            "example" : "pa$$w0rd"
+          },
+          "organazationId" : {
+            "type" : "string",
+            "example" : "i3pjxir8"
+          },
+          "roleId" : {
+            "type" : "string",
+            "example" : "i3pjxir8"
+          }
+        }
+      },
+      "Team" : {
+        "type" : "object",
+        "required" : [ "name", "organization" ],
+        "properties" : {
+          "name" : {
+            "type" : "string",
+            "example" : "Filelocker"
+          },
+          "userIds" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string",
+              "example" : "tkam2ipr"
+            }
+          },
+          "organizationId" : {
+            "type" : "string",
+            "example" : "katqt857"
+          }
+        }
+      },
+      "Organization" : {
+        "type" : "object",
+        "required" : [ "domain", "name" ],
+        "properties" : {
+          "domain" : {
+            "type" : "string",
+            "example" : "kanamei.filelocker.jp"
+          },
+          "name" : {
+            "type" : "string",
+            "example" : "かなめい"
+          }
+        }
+      }
+    }
+  }
+}
