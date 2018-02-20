@@ -9,6 +9,20 @@ export interface IAPIOptions {
   request?: AxiosRequestConfig
 }
 
+export class Retrier <U> {
+  public retries = 0
+  private process: () => Promise<AxiosResponse<U>>
+
+  constructor (process: () => Promise<AxiosResponse<U>>) {
+    this.process = process
+  }
+
+  public async retry () {
+    this.retries++
+    return this.process()
+  }
+}
+
 export class BaseAPI {
   public client: AxiosInstance
 
@@ -22,7 +36,7 @@ export class BaseAPI {
     const params = args.shift()
     await this.presend()
     return this.invoke<U>(definition.method, definition.path, params)
-      .catch((err) => this.onError<U>(err, () => this.send(operationId, definition, listArguments)))
+      .catch((err) => this.onError<U>(err, new Retrier(() => this.send(operationId, definition, listArguments))))
   }
 
   protected invoke <U> (method: string, path: string, params: any): AxiosPromise<U> {
@@ -45,7 +59,7 @@ export class BaseAPI {
     // noop
   }
 
-  protected async onError <U> (err: AxiosError, retrier: () => Promise<AxiosResponse<U>>): Promise<AxiosResponse<U>> {
+  protected async onError <U> (err: AxiosError, retrier: Retrier<U>): Promise<AxiosResponse<U>> {
     return Promise.reject(err)
   }
 }
