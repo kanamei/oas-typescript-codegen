@@ -22,7 +22,7 @@ export class BaseAPI {
     const params = args.shift()
     await this.presend()
     return this.invoke<U>(definition.method, definition.path, params)
-      .catch((err) => this.onError<U>(err))
+      .catch((err) => this.onError<U>(err, () => this.send(operationId, definition, listArguments)))
   }
 
   protected invoke <U> (method: string, path: string, params: any): AxiosPromise<U> {
@@ -45,7 +45,7 @@ export class BaseAPI {
     // noop
   }
 
-  protected async onError <U> (err: AxiosError): Promise<AxiosResponse<U>> {
+  protected async onError <U> (err: AxiosError, retrier: () => Promise<AxiosResponse<U>>): Promise<AxiosResponse<U>> {
     return Promise.reject(err)
   }
 }
