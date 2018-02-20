@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosTransformer, AxiosPromise } from 'axios'
+import axios, { AxiosRequestConfig, AxiosTransformer, AxiosPromise, AxiosResponse, AxiosError } from 'axios'
 
 export interface IDefinition {
   path: string
@@ -19,7 +19,7 @@ export class BaseAPI {
     this.requestTransformer = options.requestTransformer
   }
 
-  public send <U> (operationId: string, definition: IDefinition, listArguments: IArguments): AxiosPromise<U> {
+  public async send <U> (operationId: string, definition: IDefinition, listArguments: IArguments): Promise<AxiosResponse<U>> {
     const args = Array.from(listArguments)
     const path = definition.path.replace(/{\w+}/g, () => args.shift())
     const params = args.shift()
@@ -29,18 +29,32 @@ export class BaseAPI {
     if (this.requestTransformer) {
       config.transformRequest = this.requestTransformer
     }
-    switch (definition.method) {
+    await this.presend()
+    return this.invoke<U>(definition.method, definition.path, config, params)
+      .catch((err) => this.onError<U>(err))
+  }
+
+  protected invoke <U> (method: string, path: string, config: AxiosRequestConfig, params: any): AxiosPromise<U> {
+    switch (method) {
       case 'get':
-        return axios[definition.method](path, { ...config, params }) as AxiosPromise<U>
+        return axios[method](path, { ...config, params })
       case 'post':
       case 'put':
       case 'patch':
-        return axios[definition.method](path, params, config) as AxiosPromise<U>
+        return axios[method](path, params, config)
       case 'delete':
       case 'head':
-        return axios[definition.method](path, { ...config, params }) as AxiosPromise<U>
+        return axios[method](path, { ...config, params })
       default:
-        throw new Error(`unsupported method '${definition.method}'`)
+        throw new Error(`unsupported method '${method}'`)
     }
+  }
+
+  protected async presend () {
+    // noop
+  }
+
+  protected async onError <U> (err: AxiosError): Promise<AxiosResponse<U>> {
+    return Promise.reject(err)
   }
 }
