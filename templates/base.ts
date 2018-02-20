@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, AxiosTransformer, AxiosPromise, AxiosResponse, AxiosError } from 'axios'
+import axios, { AxiosRequestConfig, AxiosTransformer, AxiosPromise, AxiosResponse, AxiosError, AxiosInstance } from 'axios'
 
 export interface IDefinition {
   path: string
@@ -6,45 +6,36 @@ export interface IDefinition {
 }
 
 export interface IAPIOptions {
-  baseURL: string
-  requestTransformer?: AxiosTransformer
+  request?: AxiosRequestConfig
 }
 
 export class BaseAPI {
-  public baseURL: string
-  public requestTransformer?: AxiosTransformer
+  public client: AxiosInstance
 
   constructor (options: IAPIOptions) {
-    this.baseURL = options.baseURL
-    this.requestTransformer = options.requestTransformer
+    this.client = axios.create(options.request)
   }
 
   public async send <U> (operationId: string, definition: IDefinition, listArguments: IArguments): Promise<AxiosResponse<U>> {
     const args = Array.from(listArguments)
     const path = definition.path.replace(/{\w+}/g, () => args.shift())
     const params = args.shift()
-    const config: AxiosRequestConfig = {
-      baseURL: this.baseURL,
-    }
-    if (this.requestTransformer) {
-      config.transformRequest = this.requestTransformer
-    }
     await this.presend()
-    return this.invoke<U>(definition.method, definition.path, config, params)
+    return this.invoke<U>(definition.method, definition.path, params)
       .catch((err) => this.onError<U>(err))
   }
 
-  protected invoke <U> (method: string, path: string, config: AxiosRequestConfig, params: any): AxiosPromise<U> {
+  protected invoke <U> (method: string, path: string, params: any): AxiosPromise<U> {
     switch (method) {
       case 'get':
-        return axios[method](path, { ...config, params })
+        return this.client[method](path, { params })
       case 'post':
       case 'put':
       case 'patch':
-        return axios[method](path, params, config)
+        return this.client[method](path, params)
       case 'delete':
       case 'head':
-        return axios[method](path, { ...config, params })
+        return this.client[method](path, { params })
       default:
         throw new Error(`unsupported method '${method}'`)
     }
