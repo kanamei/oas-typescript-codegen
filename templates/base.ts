@@ -35,7 +35,7 @@ export class BaseAPI {
     const path = definition.path.replace(/{\w+}/g, () => args.shift())
     const params = args.shift()
     await this.presend()
-    return this.invoke<U>(definition.method, definition.path, params)
+    return this.invoke<U>(definition.method, path, params)
       .catch((err) => this.onError<U>(err, new Retrier(() => this.send(operationId, definition, listArguments))))
   }
 
