@@ -44,6 +44,7 @@ export declare class Generator {
     private writePackage(info);
     private extractRequestBody(operation);
     private extractResponseBody(operation);
+    private extractRequestParameters(operation);
     private compileInterface(operationId, type, schema);
     private loadSpecification(file);
 }
