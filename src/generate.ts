@@ -232,6 +232,7 @@ export class Generator {
     return {
       schema: {
         type: 'object',
+        additionalProperties: false,
         required: queries.filter(({ required }) => required).map(({ name }) => name),
         properties,
       },
