@@ -90,8 +90,14 @@ export class Generator {
         const requestBody = this.extractRequestBody(operation)
         let requestParameterType: string | undefined
 
+        const requestParameters = this.extractRequestParameters(operation)
+
         if (requestBody && requestBody.schema) {
           const requestInterface = await this.compileInterface(operation.operationId, 'RequestInput', requestBody.schema)
+          imports.push(requestInterface.import)
+          requestParameterType = requestInterface.interfaceName
+        } else if (requestParameters && requestParameters.schema) {
+          const requestInterface = await this.compileInterface(operation.operationId, 'RequestInput', requestParameters.schema)
           imports.push(requestInterface.import)
           requestParameterType = requestInterface.interfaceName
         }
@@ -207,6 +213,26 @@ export class Generator {
     }
     const jsonResponseBody = response.content[this.contentType]
     return jsonResponseBody
+  }
+
+  private extractRequestParameters (operation: OpenAPI.IOperationObject): OpenAPI.IMediaTypeObject | undefined {
+    if (!operation || !operation.parameters) {
+      return undefined
+    }
+    const queries = (operation.parameters as OpenAPI.IParameterObject[]).filter((parameter) => parameter.in === 'query')
+    const properties = queries.reduce((prev, parameter) => {
+      return {
+        ...prev,
+        [parameter.name]: parameter.schema,
+      }
+    }, {})
+    return {
+      schema: {
+        type: 'object',
+        required: queries.filter(({ required }) => required).map(({ name }) => name),
+        properties,
+      },
+    }
   }
 
   private async compileInterface (operationId: string, type: string, schema: OpenAPI.ISchemaObject) {
