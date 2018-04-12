@@ -220,6 +220,9 @@ export class Generator {
       return undefined
     }
     const queries = (operation.parameters as OpenAPI.IParameterObject[]).filter((parameter) => parameter.in === 'query')
+    if (queries.length === 0) {
+      return undefined
+    }
     const properties = queries.reduce((prev, parameter) => {
       return {
         ...prev,
