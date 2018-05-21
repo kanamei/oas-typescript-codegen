@@ -77,6 +77,7 @@ export class Generator {
     const definitions = {}
     const endpoints: IEndpoint[] = []
     const imports: string[] = []
+    const exports: string[] = []
 
     for (const path of Object.keys(oas.paths)) {
       const pathDefinition: OpenAPI.IPathItemObject = oas.paths[path]
@@ -95,10 +96,12 @@ export class Generator {
         if (requestBody && requestBody.schema) {
           const requestInterface = await this.compileInterface(operation.operationId, 'RequestInput', requestBody.schema)
           imports.push(requestInterface.import)
+          exports.push(requestInterface.export)
           requestParameterType = requestInterface.interfaceName
         } else if (requestParameters && requestParameters.schema) {
           const requestInterface = await this.compileInterface(operation.operationId, 'RequestInput', requestParameters.schema)
           imports.push(requestInterface.import)
+          exports.push(requestInterface.export)
           requestParameterType = requestInterface.interfaceName
         }
 
@@ -108,6 +111,7 @@ export class Generator {
         if (responseBody && responseBody.schema) {
           const responseInterface = await this.compileInterface(operation.operationId, 'Response', responseBody.schema)
           imports.push(responseInterface.import)
+          exports.push(responseInterface.export)
           responseType = responseInterface.interfaceName
         }
 
@@ -136,6 +140,7 @@ export class Generator {
     const evaluator = new Evaluator()
     const source = evaluator.evaluate(pathUtil.join(__dirname, '../templates/api.ts'), {
       imports,
+      exports,
       definitions: definitionsLintResult.output,
       endpoints,
     })
@@ -276,6 +281,7 @@ export class Generator {
       interfaceName,
       intrefaceFileName,
       import: `import { ${interfaceName} } from './schema/${intrefaceFileName}'`,
+      export: `export * from './schema/${intrefaceFileName}'`,
     }
   }
 
