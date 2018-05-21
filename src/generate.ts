@@ -141,6 +141,8 @@ export class Generator {
     })
 
     await this.copy(pathUtil.join(__dirname, '../templates/base.ts'), pathUtil.join(outDir, './src/base.ts'))
+    await this.copy(pathUtil.join(__dirname, '../templates/tsconfig.json'), pathUtil.join(outDir, './tsconfig.json'))
+    await this.copy(pathUtil.join(__dirname, '../templates/gitignore'), pathUtil.join(outDir, './.gitignore'))
     await this.output(pathUtil.join(outDir, './src/api.ts'), source)
     await this.writePackage(oas.info)
   }
@@ -177,10 +179,17 @@ export class Generator {
       name: `${kebabCase(info.title)}-sdk`,
       version: info.version,
       description: `${info.description} (auto generated sdk by kanamei/oas-typescript-codegen)`,
-      main: 'src/api.ts',
       private: true,
+      main: 'dist/api.js',
+      types: 'types/api.d.ts',
+      scripts: {
+        build: 'tsc -p .',
+      },
       dependencies: {
         axios: 'latest'
+      },
+      devDependencies: {
+        typescript: 'latest'
       },
     }, null, 2)
     await new Promise((resolve, reject) => {
